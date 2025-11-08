@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <!-- Google material-icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS linking -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="wrapper" id="wrapper">
+        <section class="top-bar">
+            <i class="material-icons">expand_more</i>
+            <p>Now Playing</p>
+            <i class="material-icons">favorite_border</i>
+        </section>
+        <section class="song-details">
+            <img src="./fonts/img.jpg" alt="" class="main-image">
+            <p class="music-name">Starlit Reverie</p>
+            <p class="artist-name">Budiat x Lil magrib</p>
+        </section>
+        <section class="progress-area">
+            <progress id="song-progress-bar" value="50" max="100"></progress>
+            <div id="music-time" class="music-time">
+                <span class="current-time">0:00</span> <span class="duration-time">-3:00</span>
+            </div>
+        </section>
+        <section class="controls">
+            <i class="material-icons">shuffle</i>
+            <i class="material-icons skip">skip_previous</i>
+            <div class="play-pause-btn">
+                <i class="material-icons">pause</i>
+            </div>
+            <i class="material-icons skip">skip_next</i>
+            <i class="material-icons">queue_music</i>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
