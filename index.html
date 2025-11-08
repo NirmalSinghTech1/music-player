@@ -11,32 +11,36 @@
 </head>
 <body>
     <main class="wrapper" id="wrapper">
-        <section class="top-bar">
-            <i class="material-icons">expand_more</i>
-            <p>Now Playing</p>
-            <i class="material-icons">favorite_border</i>
-        </section>
-        <section class="song-details">
-            <img src="./fonts/img.jpg" alt="" class="main-image">
-            <p class="music-name">Starlit Reverie</p>
-            <p class="artist-name">Budiat x Lil magrib</p>
-        </section>
-        <section class="progress-area">
-            <progress id="song-progress-bar" value="50" max="100"></progress>
-            <div id="music-time" class="music-time">
-                <span class="current-time">0:00</span> <span class="duration-time">-3:00</span>
-            </div>
-        </section>
-        <section class="controls">
-            <i class="material-icons">shuffle</i>
-            <i class="material-icons skip">skip_previous</i>
-            <div class="play-pause-btn">
-                <i class="material-icons">pause</i>
-            </div>
-            <i class="material-icons skip">skip_next</i>
-            <i class="material-icons">queue_music</i>
-        </section>
+        <div>
+            <section class="top-bar">
+                <i class="material-icons">expand_more</i>
+                <p>Now Playing</p>
+                <i class="material-icons">favorite_border</i>
+            </section>
+            <section class="song-details">
+                <img src="" alt="" class="main-image" id="main-image">
+                <p class="music-name"></p>
+                <p class="artist-name"></p>
+            </section>
+            <section class="progress-area">
+                <!-- <progress id="song-progress-bar" value="50" max="100"></progress> -->
+                <div id="song-progress-bar"></div>
+                <audio src="" id="audio"></audio>
+                <div id="music-time" class="music-time">
+                    <span class="current-time"></span> <span class="duration-time"></span>
+                </div>
+            </section>
+            <section class="controls">
+                <i class="material-icons" id="shuffle">shuffle</i>
+                <i class="material-icons skip" id="skip-previous">skip_previous</i>
+                <div class="play-pause-btn">
+                    <i class="material-icons">play_arrow</i>
+                </div>
+                <i class="material-icons skip" id="skip-next">skip_next</i>
+                <i class="material-icons" id="queue-music">queue_music</i>
+            </section>
+        </div>
     </main>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
