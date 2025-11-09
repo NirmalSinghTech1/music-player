@@ -2,14 +2,16 @@ import musicDetails from "./music.js"
 
 // variables 
 const wrapper = document.querySelector('#wrapper')
+const favorite = wrapper.querySelector('#favorite')
 const mainImage = wrapper.querySelector('#main-image')
 const musicName = wrapper.querySelector('.music-name')
 const artistName = wrapper.querySelector('.artist-name')
 const progressBar = wrapper.querySelector('#song-progress-bar')
+const bar = wrapper.querySelector('#bar')
 const audio = wrapper.querySelector('#audio')
 const currentTime = wrapper.querySelector('.current-time')
 const durationTime = wrapper.querySelector('.duration-time')
-const shuffle = wrapper.querySelector('#shuffle')
+const musicMode = wrapper.querySelector('#music-mode')
 const skipPrevious = wrapper.querySelector('#skip-previous')
 const playPauseBtn = wrapper.querySelector('.play-pause-btn')
 const playPause = wrapper.querySelector('.play-pause-btn i')
@@ -18,6 +20,7 @@ const queueMusic = wrapper.querySelector('#queue-music')
 
 let musicIndex = Math.floor(Math.random() * musicDetails.length) + 1
 let isMusicPlaying = false
+let canPlay = false
 
 window.addEventListener('load', () => {
     UI.loadMusic()
@@ -34,9 +37,10 @@ class UI {
     }
 }
 
-class Music {
+export class Music {
     static playMusic() {
-        audio.play()
+        audio.play() 
+
         playPause.innerHTML = 'pause'
     }
     
@@ -56,12 +60,15 @@ class Music {
         if(musicIndex > musicDetails.length){
             musicIndex = 1
         }
-
-        Music.playMusic()
+        audio.addEventListener('canplay', () => {
+            Music.playMusic()
+        })
+        // console.log(musicIndex)
     }
-
+    
     static previousMusic() {
         musicIndex--
+        // console.log(musicIndex)
         if(musicIndex <= 0){
             musicIndex = musicDetails.length
         }
@@ -95,7 +102,7 @@ audio.addEventListener('timeupdate', (e)=> {
     let min = Math.floor(audioCurrentTime / 60)
 
     let time = audioCurrentTime / audioDuration * 100
-
+    bar.style.width = `${time}%`
     if(sec >= 59){
         sec = sec % 60
     }
@@ -110,3 +117,68 @@ audio.addEventListener('loadedmetadata', (e) => {
 
     durationTime.innerHTML = `${min}:${sec < 10 ? '0' : ''}${sec}`
 })
+
+class XMouseEvent {
+    static clickEvent(event) {
+        if(event.offsetX >= 0){
+            bar.style.width = `${event.offsetX}px`
+            let barWidth = progressBar.offsetWidth
+            
+            let startTime = (event.offsetX * audio.duration) / barWidth
+            audio.currentTime = startTime
+        }
+    }
+}
+
+progressBar.addEventListener('click', (e) => {
+    XMouseEvent.clickEvent(e)
+})
+
+musicMode.addEventListener('click', () => {
+    let mode = musicMode.innerText
+    switch(mode){
+        case 'repeat':
+            musicMode.innerText = 'repeat_one'
+            break;
+        case 'repeat_one':
+            musicMode.innerText = 'shuffle'
+            break;
+        case 'shuffle':
+            musicMode.innerText = 'repeat'
+            break;
+        default: 
+            break;
+    }
+})
+
+audio.addEventListener('ended', () => {
+    let mode = musicMode.innerText
+    console.log(mode)
+    switch(mode) {
+        case 'repeat':
+            Music.nextMusic()
+            UI.loadMusic()
+            break;
+        case 'repeat_one':
+            Music.playMusic()
+            break;
+        case 'shuffle':
+            musicIndex = Math.floor(Math.random() * musicDetails.length) + 1
+            console.log('new Index', musicIndex)
+            UI.loadMusic()
+            Music.playMusic()
+            break;
+        default: 
+            break;
+    }
+    // Music.nextMusic()
+    // UI.loadMusic()
+})
+
+favorite.addEventListener('click', () => {
+    favorite.innerText = favorite.innerText === 'favorite' ? 'favorite_border' : 'favorite'
+    
+    favorite.classList.toggle('liked')
+    console.log(favorite)
+})
+
