@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Player</title>
+
     <!-- Google material-icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- CSS linking -->
@@ -39,7 +40,30 @@
                     <i class="material-icons">play_arrow</i>
                 </div>
                 <i class="material-icons skip" id="skip-next">skip_next</i>
-                <i class="material-icons" id="queue-music"><a href="library.html">queue_music</a></i>
+                <i class="material-icons" id="queue-music">queue_music</i>
+            </section>
+        </div>
+        <div id="library-main-container" class="library-main-container">
+            <section class="lib-top-bar">
+                <i class="material-icons" id="arrow-back">arrow_back</i>
+                <p>My Music</p>
+            </section>
+            <section class="categories">
+                <span>All</span>
+                <span>Liked Songs</span>
+                <span>Download</span>
+            </section>
+            <section class="lib-music-data">
+                <ul id="lib-songs-list">
+                    <!-- <li id="song">
+                        <img src="./images/Imagine_dragons_natural.jfif" alt="" class="song-image">
+                        <div class="song-details">
+                            <p class="song-name">Starlik Reverie</p>
+                            <p class="song-artist">By <span>Budiarti</span> • 04:24</p>
+                        </div>
+                        <i class="material-icons lib-song-play">play_arrow</i>
+                    </li> -->
+                </ul>
             </section>
         </div>
     </main>
