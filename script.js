@@ -30,8 +30,7 @@ let musicIndex = Math.floor(Math.random() * musicDetails.length) + 1
 
 window.addEventListener('load', () => {
     UI.loadMusic(musicDetails[musicIndex - 1])
-    UI.loadAllPlaylist()
-    FavoriteSong.loadFavoriteSongs()
+    console.log(wrapper.offsetHeight)
 })
 
 // Handles UI updates and DOM manipulation
@@ -40,17 +39,18 @@ class UI {
     // display current music-track details
     static loadMusic(music){
         mainImage.setAttribute('src', `./images/${music.poster}.jfif`)
+        mainImage.setAttribute('alt', `${music.title} song poster`)
         musicName.innerText = music.title
         artistName.innerText = music.artist
         audio.setAttribute('src', `./tracks/${music.track}.mp3`)
         wrapper.style.background = `linear-gradient(rgba(0,0,0,0.1), #0c0c0c 60%), url("./images/${musicDetails[musicIndex - 1].poster}.jfif") no-repeat`; 
         wrapper.style.backgroundSize = '100%'
-        FavoriteSong.loadFavoriteSongs()
     }
 
     // load all playlist songs - All Tab under categories
     static loadAllPlaylist() {
         allSongsTab.classList.add('current-tab')
+        allSongsTab.setAttribute('aria-selected', true)
         songsList.innerHTML = ``
 
         musicDetails.forEach( (song, index) => {
@@ -59,12 +59,12 @@ class UI {
             li.setAttribute('id', 'song')
             li.innerHTML = `
                 <div class="song-img-wrapper" data-img="${index + 1}" >
-                    <img src="./images/${poster}.jfif" alt="${title} song poster" class="song-image">
+                    <img src="./images/${poster}.jfif" alt="${title} song poster" class="song-image" width="60" height="60">
                 </div>
                 <div class="song-details">
-                    <audio src="./tracks/${track}.mp3" class="playlist-audio-track" data-audio="${index + 1}"></audio>
+                    <audio src="./tracks/${track}.mp3" class="playlist-audio-track all-tab-audio" data-audio="${index + 1}"></audio>
                     <p class="song-name" data-title="${index + 1}">${title}</p>
-                    <p class="song-artist">By <span>${artist}</span> • 04:24</p>
+                    <p class="song-artist">By <span>${artist}</span> • <span class="all-tab-duration-${index + 1}"></span></p>
                 </div>
                 <i class="material-icons lib-song-play" data-btn=${index + 1}>play_arrow</i>
             `
@@ -80,6 +80,7 @@ class UI {
         if(!audio.paused){
             UI.nowPlaying(musicIndex)
         }
+        UI.gettingAllSongsDuration()
     }
 
     // Load all liked songs - Liked Tab under categories
@@ -89,8 +90,12 @@ class UI {
         songsList.innerHTML = ``
         
         likedSongsTab.classList.add('current-tab')
+        likedSongsTab.setAttribute('aria-selected', true)
+
         allSongsTab.classList.remove('current-tab')
         downloadTab.classList.remove('current-tab')
+        allSongsTab.setAttribute('aria-selected', false)
+        downloadTab.setAttribute('aria-selected', false)
 
         UI.clearPlayingUi()
 
@@ -100,16 +105,16 @@ class UI {
             likedSongsFromLocal.forEach( songId => {
                 const { title, track, artist, poster } = musicDetails[songId]
                 const li = document.createElement('li')
-
+                
                 li.setAttribute('id', 'song')
                 li.innerHTML = `
                     <div class="song-img-wrapper" data-img="${songId}" >
-                        <img src="./images/${poster}.jfif" alt="${title} song poster" class="song-image">
+                        <img src="./images/${poster}.jfif" alt="${title} song poster" class="song-image" width="60" height="60">
                     </div>
                     <div class="song-details">
-                        <audio src="./tracks/${track}.mp3" class="playlist-audio-track" data-audio="${songId}"></audio>
-                        <p class="song-name" data-title="${songId}">${title}</p>
-                        <p class="song-artist">By <span>${artist}</span> • 04:24</p>
+                        <audio src="./tracks/${track}.mp3" class="playlist-audio-track liked-tab-audio" data-audio="${songId}"></audio>
+                        <p class="song-name">${title}</p>
+                        <p class="song-artist">By <span>${artist}</span> • <span class="liked-tab-duration-${songId}"></span></p>
                     </div>
                     <i class="material-icons lib-song-play" data-btn=${songId}>play_arrow</i>
                 `
@@ -122,38 +127,47 @@ class UI {
         } else {
             songsList.innerHTML = `<p class="no-songs-message">You haven't liked any songs yet.</p>`
         }
+        UI.gettingLikedSongsDuration()
     }
 
     // Download Tab under categories
     static loadDownload() {
         allSongsTab.classList.remove('current-tab')
         likedSongsTab.classList.remove('current-tab')
+        allSongsTab.setAttribute('aria-selected', false)
+        likedSongsTab.setAttribute('aria-selected', false)
+
         downloadTab.classList.add('current-tab')
+        downloadTab.setAttribute('aria-selected', true)
 
         songsList.innerHTML = ``
         songsList.innerHTML = `<p class="no-songs-message">This option is currently unavailable.</p>`
     }
 
-    // Clearing current playing music UI when audio is paused
-    static clearPlayingUi() {
+    // clearing sound waves gif
+    static clearGifs() {
         const songImgWrapper = document.querySelectorAll('.song-img-wrapper')
-        const songNameAll = document.querySelectorAll('.song-name')
-        const libSongPlayBtns = document.querySelectorAll('.lib-song-play')
-
-        // clearing sound waves gif
         songImgWrapper.forEach( img => {
             if(img.classList.contains('gif')){
                 img.classList.remove('gif')
             }
         })
-        // clearing green color of song title
+
+    }
+
+    // clearing green color of song title
+    static clearHighlight() {
+        const songNameAll = document.querySelectorAll('.song-name')
         songNameAll.forEach( name => {
             if(name.classList.contains('green')){
                 name.classList.remove('green')
             }
         })
+    }
 
-        // Adding pause button to all playlist songs
+    // Adding pause button to all playlist songs
+    static pauseAllBtns() {
+        const libSongPlayBtns = document.querySelectorAll('.lib-song-play')
         libSongPlayBtns.forEach( btn => {
             if(btn.innerHTML === 'pause'){
                 btn.innerHTML = 'play_arrow'
@@ -161,9 +175,15 @@ class UI {
         })
     }
 
+    // Clearing current playing music UI when audio is paused
+    static clearPlayingUi() {
+        UI.clearGifs()
+        UI.clearHighlight()
+        UI.pauseAllBtns()
+    }
+
     // Updating the playlist UI while a song is playing
     static nowPlaying(currentIndex) {
-        console.log('nowplaying', currentIndex)
         const playlistSongImg = document.querySelector(`[data-img="${currentIndex}"]`)
         const playlistSongName = document.querySelector(`[data-title="${currentIndex}"]`)
         const playlistSongPlay = document.querySelector(`[data-btn="${currentIndex}"]`)
@@ -173,6 +193,37 @@ class UI {
         if(playlistSongPlay){
             playlistSongPlay.innerHTML = 'pause';
         }
+    }
+
+    static gettingAllSongsDuration() {
+       const allAudio = document.querySelectorAll('.all-tab-audio')
+       allAudio.forEach( (item, index) => {
+        const span = document.querySelector(`.all-tab-duration-${index + 1}`)
+        item.addEventListener('loadedmetadata', (e) => {
+            const durationInSec = e.target.duration
+            let min = Math.floor(durationInSec / 60)
+            let sec = Math.floor(durationInSec % 60)
+            
+            span.innerHTML = `${min}:${sec < 10 ? '0' : ''}${sec}`
+        })
+       })
+    }
+
+    static gettingLikedSongsDuration() {
+       let likedSongs = JSON.parse(localStorage.getItem('likedSongs'))
+       likedSongs.forEach( liked => {
+            const span = document.querySelector(`.liked-tab-duration-${liked}`)
+            const likedAudio = document.querySelector(`[data-audio="${liked}"]`)
+            if(span && likedAudio) {
+                likedAudio.addEventListener('loadedmetadata', (e) => {
+                    const durationInSec = e.target.duration
+                    let min = Math.floor(durationInSec / 60)
+                    let sec = Math.floor(durationInSec % 60)
+                    
+                    span.innerHTML = `${min}:${sec < 10 ? '0' : ''}${sec}`
+                })
+            }
+       })
     }
 }
 
@@ -245,6 +296,7 @@ audio.addEventListener('timeupdate', (e)=> {
 
     let time = audioCurrentTime / audioDuration * 100
     bar.style.width = `${time}%`
+    bar.setAttribute('valuenow', Math.floor(time))
     if(sec >= 59){
         sec = sec % 60
     }
@@ -257,7 +309,7 @@ audio.addEventListener('loadedmetadata', (e) => {
     const durationInSec = e.target.duration
     let min = Math.floor(durationInSec / 60)
     let sec = Math.floor(durationInSec % 60)
-
+    
     durationTime.innerHTML = `${min}:${sec < 10 ? '0' : ''}${sec}`
 })
 
@@ -284,12 +336,15 @@ musicMode.addEventListener('click', () => {
     switch(mode){
         case 'repeat':
             musicMode.innerText = 'repeat_one'
+            musicMode.setAttribute('aria-labelledby', 'repeat-current-song')
             break;
         case 'repeat_one':
             musicMode.innerText = 'shuffle'
+            musicMode.setAttribute('aria-lablelledby', 'play-random-songs')
             break;
         case 'shuffle':
             musicMode.innerText = 'repeat'
+            musicMode.setAttribute('aria-labelledby', 'repeat-playlist-songs')
             break;
         default: 
             break;
@@ -342,6 +397,7 @@ class FavoriteSong {
     static loadFavoriteSongs() {
         let likedSongs = JSON.parse(localStorage.getItem('likedSongs')) || []
         const isLiked = likedSongs.includes(musicIndex - 1)
+        favorite.setAttribute('aria-label', isLiked ? 'liked' : 'like button')
         
         if(isLiked){
             favorite.innerHTML = 'favorite'
@@ -356,7 +412,6 @@ class FavoriteSong {
 // Handles click event when the song like button is clicked
 favorite.addEventListener('click', () => {
     favorite.innerText = favorite.innerText === 'favorite' ? 'favorite_border' : 'favorite'
-
     FavoriteSong.addToFavorite(musicIndex - 1)
     FavoriteSong.loadFavoriteSongs()
 })
@@ -365,7 +420,10 @@ favorite.addEventListener('click', () => {
 queueMusic.addEventListener('click', () => {
    libraryContainer.classList.add('show-songs')
    libraryContainer.classList.remove('hide-songs')
-    UI.loadLikedSongs()
+
+   libraryContainer.setAttribute('aria-expanded', 'true')
+   UI.loadLikedSongs()
+   UI.loadAllPlaylist()
 })
 
 /* =====================
@@ -378,25 +436,33 @@ const songsList = libraryContainer.querySelector('#lib-songs-list')
 arrowBack.addEventListener('click', () => {
     libraryContainer.classList.add('hide-songs')  
     libraryContainer.classList.remove('show-songs')
+
+    libraryContainer.setAttribute('aria-expanded', 'false')
 })
 
 // Handles music play/pause directly from playlist
 class MyMusic {
 
-    // Pausing all music and updating button UI
-    static pauseAllMusic(){
+    static pauseAllSongs() {
         let allSongs = document.querySelectorAll('.playlist-audio-track')
-        const allBtns = document.querySelectorAll('.lib-song-play')
-
         allSongs.forEach( song => {
             song.pause()
         })
+    }
 
+    static pauseBtnsUi(){
+        const allBtns = document.querySelectorAll('.lib-song-play')
         allBtns.forEach( btn => {
             if(btn.innerHTML === 'pause') {
                 btn.innerHTML = 'play_arrow'
             }
         })
+    }
+
+    // Pausing all music and updating button UI
+    static pauseAllMusic(){
+        MyMusic.pauseAllSongs()
+        MyMusic.pauseBtnsUi()
     }
 
     // Handles play/pause music in playlist
