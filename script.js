@@ -30,6 +30,7 @@ let musicIndex = Math.floor(Math.random() * musicDetails.length) + 1
 
 window.addEventListener('load', () => {
     UI.loadMusic(musicDetails[musicIndex - 1])
+    UI.loadAllPlaylist()
 })
 
 // Handles UI updates and DOM manipulation
@@ -422,7 +423,6 @@ queueMusic.addEventListener('click', () => {
 
    libraryContainer.setAttribute('aria-expanded', 'true')
    UI.loadLikedSongs()
-   UI.loadAllPlaylist()
 })
 
 /* =====================
