@@ -30,7 +30,6 @@ let musicIndex = Math.floor(Math.random() * musicDetails.length) + 1
 
 window.addEventListener('load', () => {
     UI.loadMusic(musicDetails[musicIndex - 1])
-    console.log(wrapper.offsetHeight)
 })
 
 // Handles UI updates and DOM manipulation
@@ -442,7 +441,6 @@ arrowBack.addEventListener('click', () => {
 
 // Handles music play/pause directly from playlist
 class MyMusic {
-
     static pauseAllSongs() {
         let allSongs = document.querySelectorAll('.playlist-audio-track')
         allSongs.forEach( song => {
